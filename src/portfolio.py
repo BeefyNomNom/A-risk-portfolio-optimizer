@@ -13,13 +13,11 @@ def simulate_portfolio(
 ):
     rng = np.random.default_rng(seed=42)
 
-    # Correlation stuff
     correlation_matrix = np.array([
         [1.0, correlation],
         [correlation, 1.0]
     ])
 
-    # Generate random stuff
     random_returns = rng.multivariate_normal(
         mean=[0, 0],
         cov=correlation_matrix,
@@ -36,7 +34,6 @@ def simulate_portfolio(
         volatility_b * random_returns[:, 1]
     )
 
-    # Combine the assets by weight
     portfolio_returns = (
         weight_a * returns_a +
         weight_b * returns_b
@@ -47,19 +44,24 @@ def simulate_portfolio(
 
 if __name__ == "__main__":
 
-    portfolio_returns = simulate_portfolio(
-        mean_a=0.0006,
-        volatility_a=0.02,
-        mean_b=0.0003,
-        volatility_b=0.01,
-        correlation=0.5
-    )
+    correlations = [-1.0, 0.0, 0.5, 1.0]
 
-    print("First 10 portfolio returns:")
-    print(portfolio_returns[:10])
+    print("Correlation v Volatility")
+    print("-----------------------------------")
 
-    print("\nMean portfolio return:")
-    print(portfolio_returns.mean())
+    for correlation in correlations:
 
-    print("\nPortfolio volatility:")
-    print(portfolio_returns.std())
+        portfolio_returns = simulate_portfolio(
+            mean_a=0.0006,
+            volatility_a=0.02,
+            mean_b=0.0003,
+            volatility_b=0.01,
+            correlation=correlation
+        )
+
+        volatility = portfolio_returns.std()
+
+        print(
+            f"Correlation: {correlation:>4.1f} "
+            f"| Volatility: {volatility:.4%}"
+        )
