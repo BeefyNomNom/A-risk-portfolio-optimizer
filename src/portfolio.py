@@ -42,26 +42,36 @@ def simulate_portfolio(
     return portfolio_returns
 
 
+def calculate_var(returns, confidence_level=0.95):
+    """
+    Calculate Value at Risk using percentile method.
+    """
+
+    percentile = (1 - confidence_level) * 100
+
+    var = np.percentile(returns, percentile)
+
+    return var
+
+
 if __name__ == "__main__":
 
-    correlations = [-1.0, 0.0, 0.5, 1.0]
+    portfolio_returns = simulate_portfolio(
+        mean_a=0.0006,
+        volatility_a=0.02,
+        mean_b=0.0003,
+        volatility_b=0.01,
+        correlation=0.5
+    )
 
-    print("Correlation v Volatility")
-    print("-----------------------------------")
+    var_95 = calculate_var(
+        portfolio_returns,
+        confidence_level=0.95
+    )
 
-    for correlation in correlations:
+    print("Port result")
+    print("---------")
 
-        portfolio_returns = simulate_portfolio(
-            mean_a=0.0006,
-            volatility_a=0.02,
-            mean_b=0.0003,
-            volatility_b=0.01,
-            correlation=correlation
-        )
-
-        volatility = portfolio_returns.std()
-
-        print(
-            f"Correlation: {correlation:>4.1f} "
-            f"| Volatility: {volatility:.4%}"
-        )
+    print(f"Mean return: {portfolio_returns.mean():.4%}")
+    print(f"Volatility: {portfolio_returns.std():.4%}")
+    print(f"95% VaR: {var_95:.4%}")
