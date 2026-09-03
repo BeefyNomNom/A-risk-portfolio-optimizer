@@ -1,25 +1,44 @@
 import numpy as np
 
 
-def simulate_returns(mean, volatility, simulations=10_000):
+def generate_asset_returns(
+    mean_a,
+    volatility_a,
+    mean_b,
+    volatility_b,
+    mean_c,
+    volatility_c,
+    correlation_matrix,
+    simulations=10_000
+):
+    """
+    Generate correlated returns for the cool three assets.
+
+    The same simulated scenarios are used for the differing
+    portfolio combinations so the optimisation is nice and fair.
+    """
+
     rng = np.random.default_rng(seed=42)
-    returns = rng.normal(
-        loc=mean,
-        scale=volatility,
+
+    random_returns = rng.multivariate_normal(
+        mean=[0, 0, 0],
+        cov=correlation_matrix,
         size=simulations
     )
-    return returns
-if __name__ == "__main__":
-    simulated_returns = simulate_returns(
-        mean=0.0005,
-        volatility=0.02
+
+    returns_a = (
+        mean_a
+        + volatility_a * random_returns[:, 0]
     )
 
-    print("First 10 simulated returns:")
-    print(simulated_returns[:10])
+    returns_b = (
+        mean_b
+        + volatility_b * random_returns[:, 1]
+    )
 
-    print("\nMean simulated return:")
-    print(simulated_returns.mean())
+    returns_c = (
+        mean_c
+        + volatility_c * random_returns[:, 2]
+    )
 
-    print("\nStandard deviation:")
-    print(simulated_returns.std())
+    return returns_a, returns_b, returns_c
