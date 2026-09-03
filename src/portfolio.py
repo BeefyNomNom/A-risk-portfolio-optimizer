@@ -44,7 +44,7 @@ def simulate_portfolio(
 
 def calculate_var(returns, confidence_level=0.95):
     """
-    Calculate Value at Risk using percentile method.
+    Calculate Risk using percentile method.
     """
 
     percentile = (1 - confidence_level) * 100
@@ -52,6 +52,23 @@ def calculate_var(returns, confidence_level=0.95):
     var = np.percentile(returns, percentile)
 
     return var
+
+
+def calculate_expected_shortfall(returns, confidence_level=0.95):
+    """
+    Calculate Expected Shortfall.
+
+    Expected Shortfall is the average return
+    among outcomes lower than the VaR threshold.
+    """
+
+    var = calculate_var(returns, confidence_level)
+
+    tail_losses = returns[returns <= var]
+
+    expected_shortfall = tail_losses.mean()
+
+    return expected_shortfall
 
 
 if __name__ == "__main__":
@@ -69,9 +86,15 @@ if __name__ == "__main__":
         confidence_level=0.95
     )
 
-    print("Port result")
-    print("---------")
+    expected_shortfall = calculate_expected_shortfall(
+        portfolio_returns,
+        confidence_level=0.95
+    )
+
+    print("Results")
+    print("-------------")
 
     print(f"Mean return: {portfolio_returns.mean():.4%}")
     print(f"Volatility: {portfolio_returns.std():.4%}")
     print(f"95% VaR: {var_95:.4%}")
+    print(f"95% Expected Shortfall: {expected_shortfall:.4%}")
